@@ -114,7 +114,11 @@ def run():
     parser.add_argument(
         '-c', '--color', 
         default='y', choices=['y', 'n'], 
-        help="Colorized Output"
+        help="colorized output"
+    )
+    parser.add_argument(
+        '--version',
+        action='version', version='%(prog)s 1.0'
     )
 
     subparsers = parser.add_subparsers()
@@ -140,6 +144,9 @@ def run():
     search_parser = subparsers.add_parser('search', help='search for a task')
     search_parser.add_argument('text', help='The text of your search')
     search_parser.set_defaults(func=search_todos)
+
+    args = parser.parse_args()
+    args.func(args)
 
 if __name__ == '__main__':
     run()
