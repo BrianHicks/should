@@ -8,7 +8,6 @@ The syntax for using should is in a state of flux. It will be updated.
 
 Here's the ideas from my list about should:
 
- - better command line interface
  - dependency management / parenting
  - due date and filtering
  - non-verbose printing format
@@ -21,3 +20,4 @@ Here's the ideas from my list about should:
 Here's the ones I've done:
 
  - color
+ - better command line interface

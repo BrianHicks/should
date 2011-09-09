@@ -27,10 +27,13 @@ COLORS = {
     'end': '\033[1;m',
 }
 
-def wrap_color(text, *args):
-    for arg in args:
+def wrap_color(args, text, *colors):
+    if args.color == 'n':
+        return text
+
+    for color in colors:
         try:
-            text = COLORS[arg] + text + COLORS['end']
+            text = COLORS[color] + text + COLORS['end']
         except KeyError:
             pass
 
@@ -59,23 +62,20 @@ def write_named_file_lines(name, lines):
         print 'could not write lines to file, here they are:'
         print lines
 
-def format_verbose_line(i, text):
-    return '%s: %s' % (wrap_color(str(i), 'blue'), text)
+def format_verbose_line(args, i, text):
+    return '%s: %s' % (wrap_color(args, str(i), 'blue'), text)
 
-def print_todos():
+def print_todos(args):
     todos = get_named_file_lines('todo')
     for i, todo in enumerate(todos):
-        print format_verbose_line(i, todo)
+        print format_verbose_line(args, i, todo)
 
-def complete_todo(n):
+def complete_todo(args):
     todos = get_named_file_lines('todo')
     for i, todo in enumerate(todos):
-        try:
-            if i == int(n):
-                archive_todo(todos[i])
-                del todos[i]
-        except ValueError:
-            print 'n must be an integer'
+        if i == int(args.n):
+            archive_todo(todos[i])
+            del todos[i]
 
     write_named_file_lines('todo', todos)
 
@@ -84,16 +84,17 @@ def archive_todo(text):
     todos.append(text)
     write_named_file_lines('archive', todos)
 
-def add_todo(text):
+def add_todo(args):
     todos = get_named_file_lines('todo')
-    todos.append(text)
+    todos.append(args.text)
+    print 'adding todo',args.text
     write_named_file_lines('todo', todos)
 
-def search_todo(text):
+def search_todos(args):
     todos = get_named_file_lines('todo')
     for i, todo in enumerate(todos):
-        if todo.find(text) != -1:
-            print format_verbose_line(i, todo)
+        if todo.find(args.text) != -1:
+            print format_verbose_line(args, i, todo)
 
 def refresh_projects():
     print 'not fully functional.'
@@ -102,28 +103,38 @@ def refresh_projects():
     for todo in todos:
         print todo
 
-## ARGUMENT PARSING ##
-
-def parse(args):
-    if args.command in ['show', 's']:
-        print_todos()
-    elif args.command in ['complete', 'c']:
-        complete_todo(args.m)
-    elif args.command in ['add', 'a']:
-        add_todo(args.m)
-    elif args.command in ['search', 'e']:
-        search_todo(args.m)
-    elif args.command in ['projects', 'p']:
-        refresh_projects()
+## EXECUTION ##
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Manage todos.')
-    parser.add_argument(
-        'command', metavar='cmd', type=str, 
-        help='one of s[how], c[omplete], a[dd], s[earch], p[rojects]',
-        choices=['show', 's', 'complete', 'c', 'add', 'a', 'search', 'e', 'projects', 'p']
-    )
-    parser.add_argument('-m', metavar='text', type=str, default='', help='text of your command. (for complete, must be an integer)')
-    
+    'parse args to run functions'
+    # global options
+    parser = argparse.ArgumentParser(description='Manage text-based task list from the command line.')
+    parser.add_argument('-c', '--color', default='y', choices=['y', 'n'], help="Colorized Output")
+
+    subparsers = parser.add_subparsers()
+
+    # show
+    show_parser = subparsers.add_parser('show', help='show your list of tasks')
+    show_parser.set_defaults(func=print_todos)
+
+    # add
+    add_parser = subparsers.add_parser('add', help='add a new task')
+    add_parser.add_argument('text', help='The text of your task')
+    add_parser.set_defaults(func=add_todo)
+
+    # complete
+    complete_parser = subparsers.add_parser('complete', help='complete a task')
+    complete_parser.add_argument('n', type=int, help='The task number to mark as completed')
+    complete_parser.set_defaults(func=complete_todo)
+
+    # search
+    search_parser = subparsers.add_parser('search', help='search for a task')
+    search_parser.add_argument('text', help='The text of your search')
+    search_parser.set_defaults(func=search_todos)
+
+    # projects
+    projects_parser = subparsers.add_parser('projects', help='view a list of projects, or modify them.')
+    projects_parser.set_defaults(func=refresh_projects)
+
     args = parser.parse_args()
-    parse(args)
+    args.func(args)
