@@ -116,13 +116,14 @@ def parse(args):
     elif args.command in ['projects', 'p']:
         refresh_projects()
 
-parser = argparse.ArgumentParser(description='Manage todos.')
-parser.add_argument(
-    'command', metavar='cmd', type=str, 
-    help='one of s[how], c[omplete], a[dd], s[earch], p[rojects]',
-    choices=['show', 's', 'complete', 'c', 'add', 'a', 'search', 'e', 'projects', 'p']
-)
-parser.add_argument('-m', metavar='text', type=str, default='', help='text of your command. (for complete, must be an integer)')
-
-args = parser.parse_args()
-parse(args)
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Manage todos.')
+    parser.add_argument(
+        'command', metavar='cmd', type=str, 
+        help='one of s[how], c[omplete], a[dd], s[earch], p[rojects]',
+        choices=['show', 's', 'complete', 'c', 'add', 'a', 'search', 'e', 'projects', 'p']
+    )
+    parser.add_argument('-m', metavar='text', type=str, default='', help='text of your command. (for complete, must be an integer)')
+    
+    args = parser.parse_args()
+    parse(args)
