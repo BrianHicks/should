@@ -105,11 +105,15 @@ def search_todos(args):
 
 ## EXECUTION ##
 
+def parseCommaSeparatedList(string):
+    'parse a comma separated list of values'
+    return string.split(',')
+
 def run():
     'parse args to run functions'
     # global options
     parser = argparse.ArgumentParser(
-        description='Manage text-based task list from the command line.'
+        description='manage text-based task list from the command line.'
     )
     parser.add_argument(
         '-c', '--color', 
@@ -129,7 +133,7 @@ def run():
 
     # add
     add_parser = subparsers.add_parser('add', help='add a new task')
-    add_parser.add_argument('text', help='The text of your task')
+    add_parser.add_argument('text', help='the text of your task')
     add_parser.set_defaults(func=add_todo)
 
     # complete
@@ -141,8 +145,30 @@ def run():
     complete_parser.set_defaults(func=complete_todo)
 
     # search
-    search_parser = subparsers.add_parser('search', help='search for a task')
-    search_parser.add_argument('text', help='The text of your search')
+    search_parser = subparsers.add_parser('find', help='find tasks')
+    search_parser.add_argument(
+        'text', help='the text of your search',
+        nargs='?'
+    )
+    search_parser.add_argument(
+        '-p', '--project',
+        help='name of a project'
+    )
+    search_parser.add_argument(
+        '-t', '--tags',
+        type=parseCommaSeparatedList,
+        help='name(s) of tag(s) (comma separated)'
+    )
+    search_parser.add_argument(
+        '--not-project',
+        type=parseCommaSeparatedList,
+        help='name(s) of project(s) to exclude (comma separated)'
+    )
+    search_parser.add_argument(
+        '--not-tags',
+        type=parseCommaSeparatedList,
+        help='name(s) of tag(s) to exclude (comma separated)'
+    )
     search_parser.set_defaults(func=search_todos)
 
     args = parser.parse_args()
