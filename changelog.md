@@ -1,6 +1,11 @@
 Changelog
 =========
 
+1.1.1
+-----
+
+ - Changed up how todos are listed (id instead of line number)
+
 1.1
 ---
 

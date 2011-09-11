@@ -242,7 +242,7 @@ def run():
     )
     parser.add_argument(
         '--version',
-        action='version', version='%(prog)s 1.1'
+        action='version', version='%(prog)s 1.1.1'
     )
 
     subparsers = parser.add_subparsers()
