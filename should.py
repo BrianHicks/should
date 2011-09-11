@@ -98,8 +98,19 @@ def extract_tags(text):
     return re.findall(r'(?<=\s@)\w+', text)
 
 def extract_project(text):
-    'find the projects in a task'
-    match = re.search(r'(?<=\s\+)\w+', text)
+    '''
+    find the projects in a task
+
+    >>> extract_project('Eat some fudge +fudgeeating @yummy')
+    'fudgeeating'
+
+    >>> extract_project('Talk to Jim+John +bigproject @inperson')
+    'bigproject'
+
+    >>> extract_project('Talk to Jim + John +bigproject @inperson')
+    'bigproject'
+    '''
+    match = re.search(r'(?<=\s\%s)\w+' % PROJECT_CHAR, text)
     if match is None:
         return ''
     else:
