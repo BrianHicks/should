@@ -126,7 +126,7 @@ def search_todos(args):
 
 ## EXECUTION ##
 
-def CommaSeparatedString(string):
+def comma_separated_string(string):
     'parse a comma separated list of values'
     return string.split(',')
 
@@ -173,17 +173,17 @@ def run():
     )
     search_parser.add_argument(
         '-t', '--tags',
-        type=CommaSeparatedString,
+        type=comma_separated_string,
         help='name(s) of tag(s) (comma separated)'
     )
     search_parser.add_argument(
         '--not-project',
-        type=CommaSeparatedString,
+        type=comma_separated_string,
         help='name(s) of project(s) to exclude (comma separated)'
     )
     search_parser.add_argument(
         '--not-tags',
-        type=CommaSeparatedString,
+        type=comma_separated_string,
         help='name(s) of tag(s) to exclude (comma separated)'
     )
     search_parser.set_defaults(func=search_todos)
