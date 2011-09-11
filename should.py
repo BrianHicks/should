@@ -4,7 +4,103 @@ import os
 import platform
 import re
 
-## COLORS ##
+# files
+# {{{
+
+def get_absolute_file_name(name):
+    'get the absolute file name relative to should.py'
+    return os.path.join(os.path.dirname(__file__), '%s.txt' % name)
+
+def get_named_file_lines(name):
+    'get the lines from a named file (assuming .txt extension)'
+    try:
+        with open(get_absolute_file_name(name), 'rb') as named_file:
+            return [line for line
+                    in named_file.read().split('\n')
+                    if line != '']
+    except IOError:
+        return []
+
+def write_named_file_lines(name, lines):
+    'write lines from a list to a file'
+    try:
+        with open(get_absolute_file_name(name), 'wb') as out_file:
+            for line in lines:
+                out_file.write('%s\n' % line)
+    except IOError:
+        print 'could not write lines to file, here they are:'
+        print lines
+
+# }}}
+# todo actions
+# {{{
+
+def complete_todo(args):
+    'complete a todo specified in args.n'
+    todos = get_named_file_lines('todo')
+    for i, todo in enumerate(todos):
+        if i == int(args.n):
+            archive_todo(todo)
+            del todos[i]
+
+    write_named_file_lines('todo', todos)
+
+def archive_todo(text):
+    'archive a line of text'
+    todos = get_named_file_lines('archive')
+    todos.append(text)
+    write_named_file_lines('archive', todos)
+
+def add_todo(args):
+    'add a todo to the text file'
+    todos = get_named_file_lines('todo')
+    todos.append(args.text)
+    print 'adding todo:', args.text
+    write_named_file_lines('todo', todos)
+
+# }}}
+# search methods
+# {{{
+
+def find_tags(text):
+    'find all the tags in a task'
+    return re.findall(r'(?<=\s@)\w+', text)
+
+def find_project(text):
+    'find the projects in a task'
+    match = re.search(r'(?<=\s\+)\w+', text)
+    if match is None:
+        return ''
+    else:
+        return text[match.start():match.end()]
+
+def search_todos(args):
+    'search todos on a single matched string'
+    todos = get_named_file_lines('todo')
+    for i, todo in enumerate(todos):
+        tags = find_tags(todo)
+        project = find_project(todo)
+
+        has_text = todo.find(args.text) != -1 if args.text else True
+        has_tags = all([tag in tags for tag in args.tags]) \
+            if args.tags else True
+        has_project = project == args.project \
+            if args.project else True
+        lacks_tags = all([tag not in tags for tag in args.not_tags]) \
+            if args.not_tags else True
+        lacks_project = all([project not in args.not_project]) \
+            if args.not_project else True
+
+        if all([has_text, has_tags, has_project, lacks_tags, lacks_project]):
+            print format_verbose_line(args, i, todo)
+
+# }}}
+# formatting
+# {{{
+
+def format_verbose_line(args, i, text):
+    'format a line of text in a verbose format'
+    return '%s: %s' % (wrap_color(args, str(i), 'blue'), text)
 
 COLORS = {
     'grey': '\033[1;30m',
@@ -39,93 +135,9 @@ def wrap_color(args, text, *colors):
 
     return text
 
-## METHODS ##
-
-def get_absolute_file_name(name):
-    'get the absolute file name relative to should.py'
-    return os.path.join(os.path.dirname(__file__), '%s.txt' % name)
-
-def get_named_file_lines(name):
-    'get the lines from a named file (assuming .txt extension)'
-    try:
-        with open(get_absolute_file_name(name), 'rb') as named_file:
-            return [line for line
-                    in named_file.read().split('\n')
-                    if line != '']
-    except IOError:
-        return []
-
-def write_named_file_lines(name, lines):
-    'write lines from a list to a file'
-    try:
-        with open(get_absolute_file_name(name), 'wb') as out_file:
-            for line in lines:
-                out_file.write('%s\n' % line)
-    except IOError:
-        print 'could not write lines to file, here they are:'
-        print lines
-
-def format_verbose_line(args, i, text):
-    'format a line of text in a verbose format'
-    return '%s: %s' % (wrap_color(args, str(i), 'blue'), text)
-
-def complete_todo(args):
-    'complete a todo specified in args.n'
-    todos = get_named_file_lines('todo')
-    for i, todo in enumerate(todos):
-        if i == int(args.n):
-            archive_todo(todo)
-            del todos[i]
-
-    write_named_file_lines('todo', todos)
-
-def archive_todo(text):
-    'archive a line of text'
-    todos = get_named_file_lines('archive')
-    todos.append(text)
-    write_named_file_lines('archive', todos)
-
-def add_todo(args):
-    'add a todo to the text file'
-    todos = get_named_file_lines('todo')
-    todos.append(args.text)
-    print 'adding todo:', args.text
-    write_named_file_lines('todo', todos)
-
-def find_tags(text):
-    'find all the tags in a task'
-    return re.findall(r'(?<=\s@)\w+', text)
-
-def find_project(text):
-    'find the projects in a task'
-    match = re.search(r'(?<=\s\+)\w+', text)
-    if match is None:
-        return ''
-    else:
-        return text[match.start():match.end()]
-
-def search_todos(args):
-    'search todos on a single matched string'
-    todos = get_named_file_lines('todo')
-    for i, todo in enumerate(todos):
-        tags = find_tags(todo)
-        project = find_project(todo)
-
-        has_text = todo.find(args.text) != -1 if args.text else True
-        has_tags = all([tag in tags for tag in args.tags]) \
-            if args.tags else True
-        has_project = project == args.project \
-            if args.project else True
-        lacks_tags = all([tag not in tags for tag in args.not_tags]) \
-            if args.not_tags else True
-        lacks_project = all([project not in args.not_project]) \
-            if args.not_project else True
-
-        if all([has_text, has_tags, has_project, lacks_tags, lacks_project]):
-            print format_verbose_line(args, i, todo)
-
+# }}}
 ## EXECUTION ##
-
+# {{{
 def comma_separated_string(string):
     'parse a comma separated list of values'
     return string.split(',')
@@ -193,3 +205,5 @@ def run():
 
 if __name__ == '__main__':
     run()
+
+# }}}
