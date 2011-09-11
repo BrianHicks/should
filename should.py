@@ -47,7 +47,7 @@ def complete_todo(args):
     'complete a todo specified in args.n'
     todos = get_named_file_lines('todo')
     for i, todo in enumerate(todos):
-        if i == int(args.n):
+        if args.id == generate_id(todo):
             archive_todo(todo)
             del todos[i]
 
@@ -88,7 +88,7 @@ def search_todos(args):
             if args.not_project else True
 
         if all([has_text, has_tags, has_project, lacks_tags, lacks_project]):
-            print format_verbose_line(args, i, todo)
+            print format_verbose_line(args, todo)
 
 # }}}
 # information from todo
@@ -185,9 +185,9 @@ def generate_id(text):
 # formatting
 # {{{
 
-def format_verbose_line(args, i, text):
+def format_verbose_line(args, text):
     'format a line of text in a verbose format'
-    return '%s: %s' % (wrap_color(args, str(i), 'blue'), text)
+    return '%s: %s' % (wrap_color(args, generate_id(text), 'blue'), text)
 
 COLORS = {
     'grey': '\033[1;30m',
@@ -255,8 +255,8 @@ def run():
     # complete
     complete_parser = subparsers.add_parser('complete', help='complete a task')
     complete_parser.add_argument(
-        'n', type=int,
-        help='The task number to mark as completed'
+        'id', type=str,
+        help='The task id to mark as completed'
     )
     complete_parser.set_defaults(func=complete_todo)
 
