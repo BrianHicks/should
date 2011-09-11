@@ -49,8 +49,8 @@ def get_named_file_lines(name):
     'get the lines from a named file (assuming .txt extension)'
     try:
         with open(get_absolute_file_name(name), 'rb') as named_file:
-            return [line for line 
-                    in named_file.read().split('\n') 
+            return [line for line
+                    in named_file.read().split('\n')
                     if line != '']
     except IOError:
         return []
@@ -98,16 +98,41 @@ def add_todo(args):
     print 'adding todo:', args.text
     write_named_file_lines('todo', todos)
 
+def find_tags(text):
+    'find all the tags in a task'
+    return re.findall(r'(?<=\s@)\w+', text)
+
+def find_project(text):
+    'find the projects in a task'
+    match = re.search(r'(?<=\s\+)\w+', text)
+    if match is None:
+        return ''
+    else:
+        return text[match.start():match.end()]
+
 def search_todos(args):
     'search todos on a single matched string'
     todos = get_named_file_lines('todo')
     for i, todo in enumerate(todos):
-        if todo.find(args.text) != -1:
+        tags = find_tags(todo)
+        project = find_project(todo)
+
+        has_text = todo.find(args.text) != -1 if args.text else True
+        has_tags = all([tag in tags for tag in args.tags]) \
+            if args.tags else True
+        has_project = project == args.project \
+            if args.project else True
+        lacks_tags = all([tag not in tags for tag in args.not_tags]) \
+            if args.not_tags else True
+        lacks_project = all([project not in args.not_project]) \
+            if args.not_project else True
+
+        if all([has_text, has_tags, has_project, lacks_tags, lacks_project]):
             print format_verbose_line(args, i, todo)
 
 ## EXECUTION ##
 
-def parseCommaSeparatedList(string):
+def CommaSeparatedString(string):
     'parse a comma separated list of values'
     return string.split(',')
 
@@ -118,8 +143,8 @@ def run():
         description='manage text-based task list from the command line.'
     )
     parser.add_argument(
-        '-c', '--color', 
-        default='y', choices=['y', 'n'], 
+        '-c', '--color',
+        default='y', choices=['y', 'n'],
         help="colorized output"
     )
     parser.add_argument(
@@ -141,7 +166,7 @@ def run():
     # complete
     complete_parser = subparsers.add_parser('complete', help='complete a task')
     complete_parser.add_argument(
-        'n', type=int, 
+        'n', type=int,
         help='The task number to mark as completed'
     )
     complete_parser.set_defaults(func=complete_todo)
@@ -158,17 +183,17 @@ def run():
     )
     search_parser.add_argument(
         '-t', '--tags',
-        type=parseCommaSeparatedList,
+        type=CommaSeparatedString,
         help='name(s) of tag(s) (comma separated)'
     )
     search_parser.add_argument(
         '--not-project',
-        type=parseCommaSeparatedList,
+        type=CommaSeparatedString,
         help='name(s) of project(s) to exclude (comma separated)'
     )
     search_parser.add_argument(
         '--not-tags',
-        type=parseCommaSeparatedList,
+        type=CommaSeparatedString,
         help='name(s) of tag(s) to exclude (comma separated)'
     )
     search_parser.set_defaults(func=search_todos)
