@@ -2,6 +2,7 @@
 import argparse
 import os
 import platform
+import random
 import re
 
 # constants
@@ -155,6 +156,30 @@ def extract_text(text):
         text = text.replace(TAG_CHAR + tag, '')
 
     return text.strip()
+
+def generate_id(text):
+    '''
+    generate a unique identifier from a bit of text
+
+    four letter id from any input
+    >>> len(generate_id('a'))
+    4
+    >>> len(generate_id('aa'))
+    4
+
+    unique for text
+    >>> generate_id('some input')
+    'iaew'
+
+    unique for task text
+    >>> generate_id('Eat some fudge +fudgeeating @yummy')
+    'ecev'
+    >>> generate_id('Eat some fudge +fudgeconsuming @delicious')
+    'ecev'
+    '''
+    random.seed(extract_text(text))
+    alpha = 'aaaaabceeeeghiiiijklmnoooopqrstuuuuvwxyz'
+    return ''.join([random.choice(alpha) for _ in range(4)])
 
 # }}}
 # formatting
