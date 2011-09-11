@@ -69,12 +69,6 @@ def format_verbose_line(args, i, text):
     'format a line of text in a verbose format'
     return '%s: %s' % (wrap_color(args, str(i), 'blue'), text)
 
-def print_todos(args):
-    'print all todos in a verbose format'
-    todos = get_named_file_lines('todo')
-    for i, todo in enumerate(todos):
-        print format_verbose_line(args, i, todo)
-
 def complete_todo(args):
     'complete a todo specified in args.n'
     todos = get_named_file_lines('todo')
@@ -154,10 +148,6 @@ def run():
 
     subparsers = parser.add_subparsers()
 
-    # show
-    show_parser = subparsers.add_parser('show', help='show your list of tasks')
-    show_parser.set_defaults(func=print_todos)
-
     # add
     add_parser = subparsers.add_parser('add', help='add a new task')
     add_parser.add_argument('text', help='the text of your task')
@@ -171,8 +161,8 @@ def run():
     )
     complete_parser.set_defaults(func=complete_todo)
 
-    # search
-    search_parser = subparsers.add_parser('find', help='find tasks')
+    # show
+    search_parser = subparsers.add_parser('show', help='show or find tasks')
     search_parser.add_argument(
         'text', help='the text of your search',
         nargs='?'
