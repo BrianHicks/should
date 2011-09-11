@@ -4,6 +4,13 @@ import os
 import platform
 import re
 
+# constants
+# {{{
+
+PROJECT_CHAR = '+'
+TAG_CHAR = '@'
+
+# }}}
 # files
 # {{{
 
@@ -62,24 +69,12 @@ def add_todo(args):
 # search methods
 # {{{
 
-def find_tags(text):
-    'find all the tags in a task'
-    return re.findall(r'(?<=\s@)\w+', text)
-
-def find_project(text):
-    'find the projects in a task'
-    match = re.search(r'(?<=\s\+)\w+', text)
-    if match is None:
-        return ''
-    else:
-        return text[match.start():match.end()]
-
 def search_todos(args):
     'search todos on a single matched string'
     todos = get_named_file_lines('todo')
     for i, todo in enumerate(todos):
-        tags = find_tags(todo)
-        project = find_project(todo)
+        tags = extract_tags(todo)
+        project = extract_project(todo)
 
         has_text = todo.find(args.text) != -1 if args.text else True
         has_tags = all([tag in tags for tag in args.tags]) \
@@ -93,6 +88,51 @@ def search_todos(args):
 
         if all([has_text, has_tags, has_project, lacks_tags, lacks_project]):
             print format_verbose_line(args, i, todo)
+
+# }}}
+# information from todo
+# {{{
+
+def extract_tags(text):
+    'find all the tags in a task'
+    return re.findall(r'(?<=\s@)\w+', text)
+
+def extract_project(text):
+    'find the projects in a task'
+    match = re.search(r'(?<=\s\+)\w+', text)
+    if match is None:
+        return ''
+    else:
+        return text[match.start():match.end()]
+
+def extract_text(text):
+    '''
+    find the text in a task
+
+    Regular text is just easy.
+        >>> extract_text('Eat some fudge +fudgeeating @yummy')
+        'Eat some fudge'
+
+    Make sure that emails are not excluded.
+        >>> extract_text('Email test@example.org +bigproject @email')
+        'Email test@example.org'
+
+    Don't exclude plusses inside the text.
+        >>> extract_text('Talk to Jim+John +bigproject @inperson')
+        'Talk to Jim+John'
+
+    Even if there are spaces between them.
+        >>> extract_text('Talk to Jim + John +bigproject @inperson')
+        'Talk to Jim + John'
+    '''
+    # remove project
+    text = text.replace(PROJECT_CHAR + extract_project(text), '')
+
+    # remove tags
+    for tag in extract_tags(text):
+        text = text.replace(TAG_CHAR + tag, '')
+
+    return text.strip()
 
 # }}}
 # formatting
