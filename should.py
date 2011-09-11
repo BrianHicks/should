@@ -1,6 +1,8 @@
 'Should, a small command line app for working with plain text todo files'
 import argparse
 import os
+import platform
+import re
 
 ## COLORS ##
 
@@ -21,7 +23,7 @@ COLORS = {
     'hcyan': '\033[1;46m',
     'hgrey': '\033[1;47m',
     'hcrimson': '\033[1;48m',
-    'end': '\033[1;m',
+    'end': '\033[0;m' if platform.uname()[0] == 'Darwin' else '\033[1;m',
 }
 
 def wrap_color(args, text, *colors):
