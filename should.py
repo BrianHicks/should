@@ -94,8 +94,19 @@ def search_todos(args):
 # {{{
 
 def extract_tags(text):
-    'find all the tags in a task'
-    return re.findall(r'(?<=\s@)\w+', text)
+    '''
+    find all the tags in a task
+
+    >>> extract_tags('This is a task +project @singletag')
+    ['singletag']
+
+    >>> extract_tags('This is a task +project @tagone @tagtwo')
+    ['tagone', 'tagtwo']
+
+    >>> extract_tags('Email test@example.org +project @email @example')
+    ['email', 'example']
+    '''
+    return re.findall(r'(?<=\s%s)\w+' % TAG_CHAR, text)
 
 def extract_project(text):
     '''
