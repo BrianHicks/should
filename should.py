@@ -92,8 +92,13 @@ def search_todos(args):
             if args.not_tags else True
         lacks_project = all([project not in args.not_project]) \
             if args.not_project else True
+        deps_satisfied = dependencies_satisfied(todo) \
+            if args.all else True
 
-        if all([has_text, has_tags, has_project, lacks_tags, lacks_project]):
+        if all([
+            has_text, has_tags, has_project, lacks_tags,
+            lacks_project, deps_satisfied
+            ]):
             print format_verbose_line(args, todo)
 
 # }}}
@@ -348,10 +353,9 @@ def run():
         help='name(s) of tag(s) to exclude (comma separated)'
     )
     show_parser.add_argument(
-        '-a', '--available',
-        action='store_true',
-        help='show available tasks (those that do not depend on anything, ' \
-             'or have dependencies satisifed)'
+        '-a', '--all',
+        action='store_false',
+        help='show all tasks (with unmet dependencies)'
     )
     show_parser.set_defaults(func=search_todos)
 
