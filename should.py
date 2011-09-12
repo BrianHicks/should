@@ -133,19 +133,23 @@ def extract_text(text):
     find the text in a task
 
     Regular text is just easy.
-        >>> extract_text('Eat some fudge +fudgeeating @yummy')
+        >>> extract_text('asdf: Eat some fudge +fudgeeating @yummy')
         'Eat some fudge'
 
     Make sure that emails are not excluded.
-        >>> extract_text('Email test@example.org +bigproject @email')
+        >>> extract_text('asdf: Email test@example.org +bigproject @email')
         'Email test@example.org'
 
+    Return the same string even if no id.
+        >>> extract_text('Eat some fudge +fudgeeating @yummy')
+        'Eat some fudge'
+
     Don't exclude plusses inside the text.
-        >>> extract_text('Talk to Jim+John +bigproject @inperson')
+        >>> extract_text('asdf: Talk to Jim+John +bigproject @inperson')
         'Talk to Jim+John'
 
     Even if there are spaces between them.
-        >>> extract_text('Talk to Jim + John +bigproject @inperson')
+        >>> extract_text('asdf: Talk to Jim + John +bigproject @inperson')
         'Talk to Jim + John'
     '''
     # remove project
@@ -155,9 +159,12 @@ def extract_text(text):
     for tag in extract_tags(text):
         text = text.replace(TAG_CHAR + tag, '')
 
+    # remove id
+    text = text.replace('%s: ' % extract_id(text, generate=False), '')
+
     return text.strip()
 
-def extract_id(text):
+def extract_id(text, generate=True):
     '''
     find the id from a task, generating if not found
 
@@ -171,7 +178,10 @@ def extract_id(text):
     if match is not None:
         return text[0:match.end()]
     else:
-        return generate_id(text)
+        if generate:
+            return generate_id(text)
+        else:
+            return ''
 
 
 def generate_id(text):
