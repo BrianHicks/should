@@ -170,9 +170,19 @@ def extract_text(text):
     Even if there are spaces between them.
         >>> extract_text('asdf: Talk to Jim + John +bigproject @inperson')
         'Talk to Jim + John'
+
+    Don't include dependencies either (but allow spaces in symbol)
+        >>> extract_text('asdf: Talk to Jim ^qwer,tyui')
+        'Talk to Jim'
+        >>> extract_text('asdf: Find pi^2 ^qwer,tyui')
+        'Find pi^2'
     '''
     # remove project
     text = text.replace(PROJECT_CHAR + extract_project(text), '')
+
+    # remove dependencies
+    dependencies = DEPENDENCY_CHAR + ','.join(extract_dependencies(text))
+    text = text.replace(dependencies, '')
 
     # remove tags
     for tag in extract_tags(text):
