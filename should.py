@@ -53,15 +53,12 @@ def complete_todo(args):
     archive = get_named_file_lines('archive')
     remaining_todos = []
 
-    print len(todos), len(archive)
     for todo in todos:
         if extract_id(todo) not in args.ids:
             remaining_todos.append(todo)
         else:
             archive.append(todo)
             print 'completed:', todo
-
-    print len(remaining_todos), len(archive)
 
     write_named_file_lines('archive', archive)
     write_named_file_lines('todo', remaining_todos)
