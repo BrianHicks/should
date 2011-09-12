@@ -281,10 +281,24 @@ def format_succinct_line(args, text):
 
 def format_verbose_line(args, text):
     'format a line of text in a verbose format'
-    return '%s: %s' % (wrap_color(args, extract_id(text), 'blue'), text[6:])
+    todo_text = extract_text(text)
+    tags = ' '.join(['%s%s' % (TAG_CHAR, t) for t in extract_tags(text)]) + ' '\
+        if len(extract_tags(text)) > 0 else ''
+    dependencies = DEPENDENCY_CHAR + ','.join(extract_dependencies(text)) \
+        if len(extract_dependencies(text)) > 0 else ''
+    project = PROJECT_CHAR + extract_project(text) + ' ' \
+        if len(extract_project(text)) > 0 else ''
+
+    return '%s: %s %s%s%s' % (
+        wrap_color(args, extract_id(text), 'blue'), 
+        todo_text, 
+        wrap_color(args, project, 'yellow'),
+        wrap_color(args, tags, 'green'),
+        wrap_color(args, dependencies, 'red'),
+    )
 
 COLORS = {
-    'grey': '\033[1;30m',
+    'gray': '\033[1;30m',
     'red': '\033[1;31m',
     'green': '\033[1;32m',
     'yellow': '\033[1;33m',
