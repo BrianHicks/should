@@ -62,7 +62,7 @@ def archive_todo(text):
 def add_todo(args):
     'add a todo to the text file'
     todos = get_named_file_lines('todo')
-    todos.append(args.text)
+    todos.append('%s: ' % (generate_id(args.text), args.text))
     print 'adding todo:', args.text
     write_named_file_lines('todo', todos)
 
@@ -214,7 +214,7 @@ def generate_id(text):
 
 def format_verbose_line(args, text):
     'format a line of text in a verbose format'
-    return '%s: %s' % (wrap_color(args, generate_id(text), 'blue'), text)
+    return '%s: %s' % (wrap_color(args, extract_id(text), 'blue'), text[6:])
 
 COLORS = {
     'grey': '\033[1;30m',
