@@ -219,8 +219,15 @@ def extract_id(text, generate=True):
     >>> extract_id('asdf: do a thing +project @tag')
     'asdf'
 
-    >>> extract_id('do a thing +project @tag')
-    'aaah'
+    If the id is missing, it is generated, not sliced
+    >>> len(extract_id('do a thing +project @tag'))
+    4
+    >>> extract_id('do a thing +project @tag') != 'do a'
+    True
+
+    If the id is missing, and generate is false, don't generate
+    >>> extract_id('do a thing +project @tag', generate=False)
+    ''
     '''
     match = re.match(r'\w{4}(?=:\s)', text)
     if match is not None:
@@ -241,15 +248,10 @@ def generate_id(text):
     >>> len(generate_id('a'))
     4
 
-    unique for text
-    >>> generate_id('some input')
-    'iaew'
-
     unique for task text
-    >>> generate_id('Eat some fudge +fudgeeating @yummy')
-    'ecev'
-    >>> generate_id('Eat some fudge +fudgeconsuming @delicious')
-    'ecev'
+    >>> gen_id = generate_id('Eat some fudge +fudgeeating @yummy')
+    >>> generate_id('Eat some fudge +fudgeconsuming @delicious') == gen_id
+    True
     '''
     random.seed(extract_text(text))
     alpha = 'aaaaabceeeeghiiiijklmnoooopqrstuuuuvwxyz'
