@@ -73,7 +73,7 @@ def add_todo(args):
 def search_todos(args):
     'search todos on a single matched string'
     todos = get_named_file_lines('todo')
-    for i, todo in enumerate(todos):
+    for todo in todos:
         tags = extract_tags(todo)
         project = extract_project(todo)
 
