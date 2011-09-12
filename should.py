@@ -104,7 +104,10 @@ def search_todos(args):
             has_text, has_tags, has_project, lacks_tags,
             lacks_project, deps_satisfied
             ]):
-            print format_verbose_line(args, todo)
+            if args.verbose:
+                print format_verbose_line(args, todo)
+            else:
+                print format_succinct_line(args, todo)
 
 # }}}
 # information from todo
@@ -257,6 +260,13 @@ def dependencies_satisfied(text):
 # formatting
 # {{{
 
+def format_succinct_line(args, text):
+    'fromat a line of text in a succinct format'
+    return '%s: %s' % (
+        wrap_color(args, extract_id(text), 'blue'), 
+        extract_text(text)
+    )
+
 def format_verbose_line(args, text):
     'format a line of text in a verbose format'
     return '%s: %s' % (wrap_color(args, extract_id(text), 'blue'), text[6:])
@@ -311,6 +321,11 @@ def run():
         '-c', '--color',
         default='y', choices=['y', 'n'],
         help="colorized output"
+    )
+    parser.add_argument(
+        '-v', '--verbose',
+        action='store_true',
+        help='show verbose output'
     )
     parser.add_argument(
         '--version',
