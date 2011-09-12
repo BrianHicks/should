@@ -10,9 +10,9 @@ Data format
 Data is stored as plain text, in the same directory as should.py. An
 archive file will also be filled with old todos.
 
-`@`: tags
-`+`: project
-`^`: dependencies
+ - `@`: tags
+ - `+`: project
+ - `^`: dependencies
 
 Usage
 -----
