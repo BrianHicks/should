@@ -232,6 +232,17 @@ def generate_id(text):
     alpha = 'aaaaabceeeeghiiiijklmnoooopqrstuuuuvwxyz'
     return ''.join([random.choice(alpha) for _ in range(4)])
 
+def dependencies_satisfied(text):
+    'whether all the todos dependencies are satisfied'
+    dependencies = extract_dependencies(text)
+    todos = get_named_file_lines('todo')
+    
+    for todo in todos:
+        if extract_id(todo) in dependencies:
+            return False
+
+    return True
+
 # }}}
 # formatting
 # {{{
