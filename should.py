@@ -62,7 +62,7 @@ def archive_todo(text):
 def add_todo(args):
     'add a todo to the text file'
     todos = get_named_file_lines('todo')
-    todos.append('%s: ' % (generate_id(args.text), args.text))
+    todos.append('%s: %s' % (generate_id(args.text), args.text))
     print 'adding todo:', args.text
     write_named_file_lines('todo', todos)
 
