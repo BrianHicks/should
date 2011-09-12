@@ -18,7 +18,10 @@ DEPENDENCY_CHAR = '^'
 
 def get_absolute_file_name(name):
     'get the absolute file name relative to should.py'
-    return os.path.join(os.path.dirname(__file__), '%s.txt' % name)
+    try:
+        return os.path.join(os.path.dirname(__file__), '%s.txt' % name)
+    except NameError:
+        return '%s.txt' % name
 
 def get_named_file_lines(name):
     'get the lines from a named file (assuming .txt extension)'
