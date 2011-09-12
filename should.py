@@ -48,15 +48,23 @@ def write_named_file_lines(name, lines):
 # {{{
 
 def complete_todo(args):
-    'complete a todo specified in args.n'
+    'complete a todo specified in args.ids'
     todos = get_named_file_lines('todo')
-    for i, todo in enumerate(todos):
-        if args.id == extract_id(todo):
-            archive_todo(todo)
-            del todos[i]
+    archive = get_named_file_lines('archive')
+    remaining_todos = []
+
+    print len(todos), len(archive)
+    for todo in todos:
+        if extract_id(todo) not in args.ids:
+            remaining_todos.append(todo)
+        else:
+            archive.append(todo)
             print 'completed:', todo
 
-    write_named_file_lines('todo', todos)
+    print len(remaining_todos), len(archive)
+
+    write_named_file_lines('archive', archive)
+    write_named_file_lines('todo', remaining_todos)
 
 def archive_todo(text):
     'archive a line of text'
@@ -322,8 +330,8 @@ def run():
     # complete
     complete_parser = subparsers.add_parser('complete', help='complete a task')
     complete_parser.add_argument(
-        'id', type=str,
-        help='The task id to mark as completed'
+        'ids', type=comma_separated_string,
+        help='The task id(s) to mark as completed'
     )
     complete_parser.set_defaults(func=complete_todo)
 
