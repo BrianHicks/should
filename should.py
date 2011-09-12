@@ -288,31 +288,37 @@ def run():
     complete_parser.set_defaults(func=complete_todo)
 
     # show
-    search_parser = subparsers.add_parser('show', help='show or find tasks')
-    search_parser.add_argument(
+    show_parser = subparsers.add_parser('show', help='show or find tasks')
+    show_parser.add_argument(
         'text', help='the text of your search',
         nargs='?'
     )
-    search_parser.add_argument(
+    show_parser.add_argument(
         '-p', '--project',
         help='name of a project'
     )
-    search_parser.add_argument(
+    show_parser.add_argument(
         '-t', '--tags',
         type=comma_separated_string,
         help='name(s) of tag(s) (comma separated)'
     )
-    search_parser.add_argument(
+    show_parser.add_argument(
         '--not-project',
         type=comma_separated_string,
         help='name(s) of project(s) to exclude (comma separated)'
     )
-    search_parser.add_argument(
+    show_parser.add_argument(
         '--not-tags',
         type=comma_separated_string,
         help='name(s) of tag(s) to exclude (comma separated)'
     )
-    search_parser.set_defaults(func=search_todos)
+    show_parser.add_argument(
+        '-a', '--available',
+        action='store_true',
+        help='show available tasks (those that do not depend on anything, ' \
+             'or have dependencies satisifed)'
+    )
+    show_parser.set_defaults(func=search_todos)
 
     args = parser.parse_args()
     args.func(args)
