@@ -6,10 +6,6 @@ create all the files it needs as it needs them.
 
 The syntax for using should is in a state of flux. It will be updated.
 
-What's being worked on, currently:
-
- - Unique ids for dependency management
-
 Here's some ideas from my list about should:
 
  - projects!
