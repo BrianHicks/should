@@ -47,9 +47,10 @@ def complete_todo(args):
     'complete a todo specified in args.n'
     todos = get_named_file_lines('todo')
     for i, todo in enumerate(todos):
-        if args.id == generate_id(todo):
+        if args.id == extract_id(todo):
             archive_todo(todo)
             del todos[i]
+            print 'completed:', todo
 
     write_named_file_lines('todo', todos)
 
