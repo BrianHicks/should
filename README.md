@@ -4,8 +4,6 @@ Should
 This is a python program to manage todos from the command line. It'll
 create all the files it needs as it needs them.
 
-The syntax for using should is in a state of flux. It will be updated.
-
 Here's some ideas from my list about should:
 
  - projects!

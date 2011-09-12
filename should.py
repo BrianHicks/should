@@ -10,6 +10,7 @@ import re
 
 PROJECT_CHAR = '+'
 TAG_CHAR = '@'
+DEPENDENCY_CHAR = '^'
 
 # }}}
 # files
@@ -165,6 +166,25 @@ def extract_text(text):
     text = text.replace('%s: ' % extract_id(text, generate=False), '')
 
     return text.strip()
+
+def extract_dependencies(text):
+    '''
+    extract dependencies (as a list) from a todo
+
+    >>> extract_dependencies('asdf: Eat some fudge +project @tag ^aaaa,bbbb')
+    ['aaaa', 'bbbb']
+
+    >>> extract_dependencies('asdf: Eat some fudge +project @tag ^aaaa')
+    ['aaaa']
+
+    >>> extract_dependencies('asdf: Eat some fudge +project @tag')
+    []
+    '''
+    match = re.search(r'(?<=\s\%s)[\w,]+' % DEPENDENCY_CHAR, text)
+    if match is None:
+        return []
+    else:
+        return text[match.start():match.end()].split(',')
 
 def extract_id(text, generate=True):
     '''
