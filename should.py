@@ -157,14 +157,31 @@ def extract_text(text):
 
     return text.strip()
 
+def extract_id(text):
+    '''
+    find the id from a task, generating if not found
+
+    >>> extract_id('asdf: do a thing +project @tag')
+    'asdf'
+
+    >>> extract_id('do a thing +project @tag')
+    'aaah'
+    '''
+    match = re.match(r'\w{4}(?=:\s)', text)
+    if match is not None:
+        return text[0:match.end()]
+    else:
+        return generate_id(text)
+
+
 def generate_id(text):
     '''
     generate a unique identifier from a bit of text
 
     four letter id from any input
-    >>> len(generate_id('a'))
+    >>> len(generate_id(''))
     4
-    >>> len(generate_id('aa'))
+    >>> len(generate_id('a'))
     4
 
     unique for text
