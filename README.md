@@ -13,8 +13,8 @@ archive file will also be filled with old todos.
  - `@`: tags
  - `+`: project
  - `^`: dependencies
- - ':': start date
- - ';': due date
+ - `:`: start date
+ - `;`: due date
 
 Usage
 -----
