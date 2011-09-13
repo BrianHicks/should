@@ -4,6 +4,7 @@ import os
 import platform
 import random
 import re
+from datetime import datetime
 
 # constants
 # {{{
@@ -11,6 +12,8 @@ import re
 PROJECT_CHAR = '+'
 TAG_CHAR = '@'
 DEPENDENCY_CHAR = '^'
+START_DATE_CHAR = ':'
+END_DATE_CHAR = ';'
 
 # }}}
 # files
@@ -157,6 +160,46 @@ def extract_project(text):
     else:
         return text[match.start():match.end()]
 
+def extract_start_date(text):
+    'extract start date'
+    return extract_date(text, START_DATE_CHAR)
+
+def extract_end_date(text):
+    'extract end date'
+    return extract_date(text, END_DATE_CHAR)
+
+def extract_date(text, char):
+    '''
+    find the start date of a task
+
+    >>> extract_date('Eat some fudge :8/5/11', ':')
+    '8/5/11'
+
+    >>> extract_date('Eat some fudge: duh! :8/5/11', ':')
+    '8/5/11'
+
+    >>> extract_date('Eat some fudge :8/5/2011', ':')
+    '8/5/2011'
+
+    >>> extract_date('Eat some fudge :8/5/011', ':')
+    ''
+    '''
+    match = re.search(
+        r'(?<=\s\%s)\d{1,2}/\d{1,2}/(\d{2}\b|\d{4})' % char,
+        text
+    )
+    if match is None:
+        return ''
+    else:
+        return text[match.start():match.end()]
+
+def convert_date(date_text):
+    'convert some date_text to a datetime object'
+    try: 
+        return datetime.strptime(text_date, '%m/%d/%Y')
+    except ValueError:
+        return datetime.strptime(text_date, '%m/%d/%y')
+
 def extract_text(text):
     '''
     find the text in a task
@@ -186,17 +229,41 @@ def extract_text(text):
         'Talk to Jim'
         >>> extract_text('asdf: Find pi^2 ^qwer,tyui')
         'Find pi^2'
+
+    Don't include start dates
+        >>> extract_text('asdf: Talk to Jim :8/5/11')
+        'Talk to Jim'
+    
+    Don't include end dates
+        >>> extract_text('asdf: Talk to Jim ;8/5/11')
+        'Talk to Jim'
     '''
     # remove project
-    text = text.replace(PROJECT_CHAR + extract_project(text), '')
+    project = extract_project(text)
+    if project != '':
+        text = text.replace(PROJECT_CHAR + project, '')
 
     # remove dependencies
-    dependencies = DEPENDENCY_CHAR + ','.join(extract_dependencies(text))
-    text = text.replace(dependencies, '')
+    dependencies = ','.join(extract_dependencies(text))
+    if dependencies != '':
+        text = text.replace(DEPENDENCY_CHAR + dependencies, '')
+
+    # remove start dates and end dates
+    start_date = extract_start_date(text)
+    end_date = extract_end_date(text)
+    
+    if start_date != '':
+        text = text.replace(START_DATE_CHAR + start_date, '')
+
+    if end_date != '':
+        text = text.replace(END_DATE_CHAR + end_date, '')
 
     # remove tags
-    for tag in extract_tags(text):
-        text = text.replace(TAG_CHAR + tag, '')
+    tags = extract_tags(text)
+
+    if len(tags) >= 0:
+        for tag in tags:
+            text = text.replace(TAG_CHAR + tag, '')
 
     # remove id
     text = text.replace('%s: ' % extract_id(text, generate=False), '')
@@ -294,17 +361,23 @@ def format_verbose_line(args, text):
     todo_text = extract_text(text)
     tags = ' '.join(['%s%s' % (TAG_CHAR, t) for t in extract_tags(text)]) + ' '\
         if len(extract_tags(text)) > 0 else ''
-    dependencies = DEPENDENCY_CHAR + ','.join(extract_dependencies(text)) \
+    dependencies = DEPENDENCY_CHAR + ','.join(extract_dependencies(text)) + ' '\
         if len(extract_dependencies(text)) > 0 else ''
     project = PROJECT_CHAR + extract_project(text) + ' ' \
         if len(extract_project(text)) > 0 else ''
+    start_date = START_DATE_CHAR + extract_start_date(text) + ' ' \
+        if len(extract_start_date(text)) > 0 else ''
+    end_date = END_DATE_CHAR + extract_end_date(text) + ' ' \
+        if len(extract_end_date(text)) > 0 else ''
 
-    return '%s: %s %s%s%s' % (
+    return '%s: %s %s%s%s%s%s' % (
         wrap_color(args, extract_id(text), 'blue'), 
         todo_text,
         wrap_color(args, project, 'yellow'),
         wrap_color(args, tags, 'green'),
         wrap_color(args, dependencies, 'red'),
+        wrap_color(args, start_date, 'cyan'),
+        wrap_color(args, end_date, 'magenta'),
     )
 
 COLORS = {
