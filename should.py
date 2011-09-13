@@ -104,9 +104,9 @@ def search_todos(args):
             has_text, has_tags, has_project, lacks_tags,
             lacks_project, deps_satisfied
             ]):
-            if args.verbose:
+            if args.verbosity == 2:
                 print format_verbose_line(args, todo)
-            else:
+            elif args.verbosity == 1:
                 print format_succinct_line(args, todo)
 
 # }}}
@@ -261,7 +261,7 @@ def dependencies_satisfied(text):
     'whether all the todos dependencies are satisfied'
     dependencies = extract_dependencies(text)
     todos = get_named_file_lines('todo')
-    
+
     for todo in todos:
         if extract_id(todo) in dependencies:
             return False
@@ -291,7 +291,7 @@ def format_verbose_line(args, text):
 
     return '%s: %s %s%s%s' % (
         wrap_color(args, extract_id(text), 'blue'), 
-        todo_text, 
+        todo_text,
         wrap_color(args, project, 'yellow'),
         wrap_color(args, tags, 'green'),
         wrap_color(args, dependencies, 'red'),
@@ -349,8 +349,8 @@ def run():
         help="colorized output"
     )
     parser.add_argument(
-        '-v', '--verbose',
-        action='store_true',
+        '-v', '--verbosity',
+        type=int, choices=[1, 2], default=2,
         help='show verbose output'
     )
     parser.add_argument(
