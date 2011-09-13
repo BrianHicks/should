@@ -43,14 +43,24 @@ def write_named_file_lines(name, lines):
         print 'could not write lines to file, here they are:'
         print lines
 
+cache = {}
+def get_cached_file_lines(name):
+    'get cached lines from a file'
+    if name in cache:
+        return cache[name]
+    else:
+        lines = get_named_file_lines(name)
+        cache[name] = lines
+        return lines
+
 # }}}
 # todo actions
 # {{{
 
 def complete_todo(args):
     'complete a todo specified in args.ids'
-    todos = get_named_file_lines('todo')
-    archive = get_named_file_lines('archive')
+    todos = get_cached_file_lines('todo')
+    archive = get_cached_file_lines('archive')
     remaining_todos = []
 
     for todo in todos:
@@ -65,13 +75,13 @@ def complete_todo(args):
 
 def archive_todo(text):
     'archive a line of text'
-    todos = get_named_file_lines('archive')
+    todos = get_cached_file_lines('archive')
     todos.append(text)
     write_named_file_lines('archive', todos)
 
 def add_todo(args):
     'add a todo to the text file'
-    todos = get_named_file_lines('todo')
+    todos = get_cached_file_lines('todo')
     new_id = generate_id(args.text)
     todos.append('%s: %s' % (new_id, args.text))
     print 'adding todo: %s (id %s)' % (args.text, new_id)
@@ -83,7 +93,7 @@ def add_todo(args):
 
 def search_todos(args):
     'search todos on a single matched string'
-    todos = get_named_file_lines('todo')
+    todos = get_cached_file_lines('todo')
     for todo in todos:
         tags = extract_tags(todo)
         project = extract_project(todo)
@@ -260,7 +270,7 @@ def generate_id(text):
 def dependencies_satisfied(text):
     'whether all the todos dependencies are satisfied'
     dependencies = extract_dependencies(text)
-    todos = get_named_file_lines('todo')
+    todos = get_cached_file_lines('todo')
 
     for todo in todos:
         if extract_id(todo) in dependencies:
