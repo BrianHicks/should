@@ -1,6 +1,21 @@
 Changelog
 =========
 
+1.3
+---
+
+ - Start and due dates
+
+1.2
+---
+
+ - ID Generation
+ - only show available tasks
+ - dependencies / parenting
+ - bug fixes for working with todos interactively (from Python)
+ - complete multiple
+ - verbosity options
+
 1.1.1
 -----
 
