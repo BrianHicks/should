@@ -91,38 +91,6 @@ def add_todo(args):
     write_named_file_lines('todo', todos)
 
 # }}}
-# search methods
-# {{{
-
-def search_todos(args):
-    'search todos on a single matched string'
-    todos = get_cached_file_lines('todo')
-    for todo in todos:
-        tags = extract_tags(todo)
-        project = extract_project(todo)
-
-        has_text = todo.find(args.text) != -1 if args.text else True
-        has_tags = all([tag in tags for tag in args.tags]) \
-            if args.tags else True
-        has_project = project == args.project \
-            if args.project else True
-        lacks_tags = all([tag not in tags for tag in args.not_tags]) \
-            if args.not_tags else True
-        lacks_project = all([project not in args.not_project]) \
-            if args.not_project else True
-        deps_satisfied = dependencies_satisfied(todo) \
-            if args.all else True
-
-        if all([
-            has_text, has_tags, has_project, lacks_tags,
-            lacks_project, deps_satisfied
-            ]):
-            if args.verbosity == 2:
-                print format_verbose_line(args, todo)
-            elif args.verbosity == 1:
-                print format_succinct_line(args, todo)
-
-# }}}
 # information from todo
 # {{{
 
@@ -193,12 +161,15 @@ def extract_date(text, char):
     else:
         return text[match.start():match.end()]
 
-def convert_date(date_text):
+def convert_date(text_date):
     'convert some date_text to a datetime object'
     try: 
         return datetime.strptime(text_date, '%m/%d/%Y')
     except ValueError:
-        return datetime.strptime(text_date, '%m/%d/%y')
+        try:
+            return datetime.strptime(text_date, '%m/%d/%y')
+        except ValueError:
+            return datetime.now()
 
 def extract_text(text):
     '''
@@ -345,6 +316,11 @@ def dependencies_satisfied(text):
 
     return True
 
+def start_date_passed(text):
+    'whether the current date is or is after the start date'
+    start_date = convert_date(extract_start_date(text))
+    return datetime.now() >= start_date
+
 # }}}
 # formatting
 # {{{
@@ -412,6 +388,40 @@ def wrap_color(args, text, *colors):
             pass
 
     return text
+
+# }}}
+# search methods
+# {{{
+
+def search_todos(args):
+    'search todos on a single matched string'
+    todos = get_cached_file_lines('todo')
+    for todo in todos:
+        tags = extract_tags(todo)
+        project = extract_project(todo)
+
+        has_text = todo.find(args.text) != -1 if args.text else True
+        has_tags = all([tag in tags for tag in args.tags]) \
+            if args.tags else True
+        has_project = project == args.project \
+            if args.project else True
+        lacks_tags = all([tag not in tags for tag in args.not_tags]) \
+            if args.not_tags else True
+        lacks_project = all([project not in args.not_project]) \
+            if args.not_project else True
+        deps_satisfied = dependencies_satisfied(todo) \
+            if not args.all else True
+        start_satisfied = start_date_passed(todo) \
+            if not args.all else True
+
+        if all([
+            has_text, has_tags, has_project, lacks_tags,
+            lacks_project, deps_satisfied, start_satisfied
+            ]):
+            if args.verbosity == 2:
+                print format_verbose_line(args, todo)
+            elif args.verbosity == 1:
+                print format_succinct_line(args, todo)
 
 # }}}
 ## EXECUTION ##
@@ -483,7 +493,7 @@ def run():
     )
     show_parser.add_argument(
         '-a', '--all',
-        action='store_false',
+        action='store_true',
         help='show all tasks (with unmet dependencies)'
     )
     show_parser.set_defaults(func=search_todos)
