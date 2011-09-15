@@ -90,6 +90,46 @@ def add_todo(args):
     print 'adding todo: %s (id %s)' % (args.text, new_id)
     write_named_file_lines('todo', todos)
 
+def edit_todos(args):
+    'edit a set of given todos'
+    todos = get_cached_file_lines('todo')
+    edited = []
+
+    chars = {
+        'project': PROJECT_CHAR,
+        'tag': TAG_CHAR,
+        'dep': DEPENDENCY_CHAR,
+        'start': START_DATE_CHAR,
+        'due': END_DATE_CHAR,
+    }
+
+    edit = get_editor(args.action, chars[args.edit_type], args.data)
+
+    for todo in todos:
+        if extract_id(todo) in args.ids:
+            edited.append(edit(todo))
+        else:
+            edited.append(todo)
+
+    write_named_file_lines('todo', edited)
+
+def get_editor(action, char, data):
+    if not isinstance(data, list):
+        data = [data]
+        
+    def inner_edit(in_string):
+        if action == 'add':
+            for datum in data:
+                if in_string.find(datum) == -1:
+                    in_string += ' ' + char + datum
+        elif action == 'remove':
+            for datum in data:
+                in_string = in_string.replace(char + datum, '')
+        
+        return re.sub(r'\s+', ' ', in_string).strip()
+
+    return inner_edit
+
 # }}}
 # information from todo
 # {{{
@@ -497,6 +537,26 @@ def run():
         help='show all tasks (with unmet dependencies)'
     )
     show_parser.set_defaults(func=search_todos)
+
+    # edit
+    edit_parser = subparsers.add_parser('edit', help='edit existing tasks')
+    edit_parser.add_argument(
+        'ids', type=comma_separated_string,
+        help='comma separated list of ids'
+    )
+    edit_parser.add_argument(
+        'action', choices=['add', 'remove'],
+        help='action to take on task(s)'
+    )
+    edit_parser.add_argument(
+        'edit_type', choices=['project', 'tag', 'dep', 'start', 'due'],
+        help='type of edit to make'
+    )
+    edit_parser.add_argument(
+        'data', type=comma_separated_string,
+        help='information to edit with (comma separated string)'
+    )
+    edit_parser.set_defaults(func=edit_todos)
 
     args = parser.parse_args()
     args.func(args)
