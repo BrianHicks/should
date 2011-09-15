@@ -1,10 +1,15 @@
 Changelog
 =========
 
+1.4
+---
+
+ - ability to edit todos after adding
+
 1.3
 ---
 
- - Start and due dates
+ - start and due dates
 
 1.2
 ---
