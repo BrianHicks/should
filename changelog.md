@@ -1,6 +1,11 @@
 Changelog
 =========
 
+1.4.1
+-----
+
+ - fix for wrong handling of dependencies
+
 1.4
 ---
 

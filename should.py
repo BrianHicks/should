@@ -487,7 +487,7 @@ def run():
     )
     parser.add_argument(
         '--version',
-        action='version', version='%(prog)s 1.4'
+        action='version', version='%(prog)s 1.4.1'
     )
 
     subparsers = parser.add_subparsers()

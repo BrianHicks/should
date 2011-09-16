@@ -59,11 +59,8 @@ Here's some ideas from my list about should:
 
  - projects!
  - due date and search
- - non-verbose printing format
  - public list / private list in different text files (for example, this
    list of ideas would be public)
- - ability to edit / add tags, projects, due dates from the command line
-   interface
 
 Here's the ones I've done:
 
@@ -71,3 +68,6 @@ Here's the ones I've done:
  - better command line interface
  - better search (by tags AND/OR projects plus exclusion)
  - dependency management / parenting
+ - non-verbose printing format
+ - ability to edit / add tags, projects, due dates from the command line
+   interface
