@@ -236,9 +236,9 @@ def extract_text(text):
         'Talk to Jim + John'
 
     Don't include dependencies either (but allow spaces in symbol)
-        >>> extract_text('asdf: Talk to Jim ^qwer,tyui')
+        >>> extract_text('asdf: Talk to Jim ^qwer ^tyui')
         'Talk to Jim'
-        >>> extract_text('asdf: Find pi^2 ^qwer,tyui')
+        >>> extract_text('asdf: Find pi^2 ^qwer ^tyui')
         'Find pi^2'
 
     Don't include start dates
@@ -255,9 +255,11 @@ def extract_text(text):
         text = text.replace(PROJECT_CHAR + project, '')
 
     # remove dependencies
-    dependencies = ','.join(extract_dependencies(text))
-    if dependencies != '':
-        text = text.replace(DEPENDENCY_CHAR + dependencies, '')
+    dependencies = extract_dependencies(text)
+
+    if len(dependencies) >= 0:
+        for dependency in dependencies:
+            text = text.replace(DEPENDENCY_CHAR + dependency, '')
 
     # remove start dates and end dates
     start_date = extract_start_date(text)
@@ -285,7 +287,7 @@ def extract_dependencies(text):
     '''
     extract dependencies (as a list) from a todo
 
-    >>> extract_dependencies('asdf: Eat some fudge +project @tag ^aaaa,bbbb')
+    >>> extract_dependencies('asdf: Eat some fudge +project @tag ^aaaa ^bbbb')
     ['aaaa', 'bbbb']
 
     >>> extract_dependencies('asdf: Eat some fudge +project @tag ^aaaa')
@@ -294,11 +296,7 @@ def extract_dependencies(text):
     >>> extract_dependencies('asdf: Eat some fudge +project @tag')
     []
     '''
-    match = re.search(r'(?<=\s\%s)[\w,]+' % DEPENDENCY_CHAR, text)
-    if match is None:
-        return []
-    else:
-        return text[match.start():match.end()].split(',')
+    return re.findall(r'(?<=\s\%s)\w+' % DEPENDENCY_CHAR, text)
 
 def extract_id(text, generate=True):
     '''
@@ -377,7 +375,8 @@ def format_verbose_line(args, text):
     todo_text = extract_text(text)
     tags = ' '.join(['%s%s' % (TAG_CHAR, t) for t in extract_tags(text)]) + ' '\
         if len(extract_tags(text)) > 0 else ''
-    dependencies = DEPENDENCY_CHAR + ','.join(extract_dependencies(text)) + ' '\
+    dependencies = ' '.join(['%s%s' % (DEPENDENCY_CHAR, d) for d in
+        extract_dependencies(text)]) + ' '\
         if len(extract_dependencies(text)) > 0 else ''
     project = PROJECT_CHAR + extract_project(text) + ' ' \
         if len(extract_project(text)) > 0 else ''
