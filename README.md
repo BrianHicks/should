@@ -55,12 +55,15 @@ You can see further help with `should.py -h` or `should.py [cmd] -h`.
 Ideas
 -----
 
-Here's some ideas from my list about do:
+Here's some ideas from my list about shoud, roughly sorted by my interest:
 
- - projects!
- - due date and search
- - public list / private list in different text files (for example, this
-   list of ideas would be public)
+ - New data format (YAML)
+ - iCal export
+ - Info website
+ - Internal optimizations for better data handling
+ - Integration with [Trello](www.trello.com)
+ - Integration with email
+ - Integration with files
 
 Here's the ones I've done:
 
