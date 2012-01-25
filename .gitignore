@@ -4,3 +4,4 @@ archive.txt
 .coverage
 *.egg-info
 dist/*
+build/*
