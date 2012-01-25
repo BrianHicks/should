@@ -20,7 +20,7 @@ setup(
     license = 'TODO',
     url = 'https://github.com/BrianHicks/should',
     download_url = 'https://github.com/BrianHicks/should',
-    scripts = ['should/bin/should.py'],
+    scripts = ['should/bin/should'],
 
     long_description = open('README.md').read(),
 )

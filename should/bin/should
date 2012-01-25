@@ -1,3 +1,4 @@
+#! python
 'Should, a small command line app for working with plain text todo files'
 import argparse
 import os
