@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name = 'Do',
+    name = 'Should',
     version = '1.4.1',
     packages = find_packages(),
 
@@ -18,9 +18,9 @@ setup(
     author_email = 'brian@brianthicks.com',
     description = 'Task Management from the Command Line',
     license = 'TODO',
-    url = 'https://github.com/BrianHicks/do',
-    download_url = 'https://github.com/BrianHicks/do',
-    scripts = ['do/bin/do.py'],
+    url = 'https://github.com/BrianHicks/should',
+    download_url = 'https://github.com/BrianHicks/should',
+    scripts = ['should/bin/should.py'],
 
     long_description = open('README.md').read(),
 )

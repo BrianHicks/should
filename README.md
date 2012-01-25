@@ -1,4 +1,4 @@
-Do
+Should
 ==
 
 This is a python program to manage todos from the command line. It'll
@@ -7,7 +7,7 @@ create all the files it needs as it needs them.
 Data format
 -----------
 
-Data is stored as plain text, in the same directory as do.py. An
+Data is stored as plain text, in the same directory as should.py. An
 archive file will also be filled with old todos.
 
  - `@`: tags
@@ -21,28 +21,28 @@ Usage
 
 To add a task to the list:
 
-    $ do.py add "program ALL the things +bigproject @work"
+    $ should.py add "program ALL the things +bigproject @work"
     adding todo: program ALL the things +bigproject @work (id ibeu)
 
 What was it I added earlier?
 
-    $ do.py show
+    $ should.py show
     ibeu: program ALL the things +bigproject @work
     aebb: eat a sandwich @food
 
 Right, but what if I want to see only the bigproject tasks?
 
-    $ do.py show -p bigproject
+    $ should.py show -p bigproject
     ibeu: program ALL the things +bigproject @work
 
 Or all the things related to food?
 
-    $ do.py show -t food
+    $ should.py show -t food
     aebb: eat a sandwich @food
 
 Or just all the things relating to sandwiches?
 
-    $ do.py show sandwich
+    $ should.py show sandwich
     aebb: eat a sandwich @food
 
 Om nom nom, and you're done. Now mark it as complete:
@@ -50,7 +50,7 @@ Om nom nom, and you're done. Now mark it as complete:
     $ do complete aebb
     completed: aebb: eat a sandwich @food
 
-You can see further help with `do.py -h` or `do.py [cmd] -h`.
+You can see further help with `should.py -h` or `should.py [cmd] -h`.
 
 Ideas
 -----
