@@ -3,3 +3,4 @@ archive.txt
 *.pyc
 .coverage
 *.egg-info
+dist/*
