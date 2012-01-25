@@ -21,6 +21,13 @@ setup(
     url = 'https://github.com/BrianHicks/should',
     download_url = 'https://github.com/BrianHicks/should',
     scripts = ['should/bin/should'],
+    classifiers=[
+        'Development Status :: 3 - Alpha',
+        'Environment :: Console',
+        'Natural Language :: English',
+        'Programming Language :: Python :: 2.7',
+        'Topic :: Utilities',
+    ],
 
     long_description = open('README.md').read(),
 )
