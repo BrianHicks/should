@@ -34,3 +34,24 @@ def get_config(extra_paths=None, exclude_local=False):
             pass
 
     return config
+
+def merge_configs(orig, new):
+    'merge two configuration dictionaries'
+    for key, value in new.items():
+        # merge if we can, set if key is not present
+        if key in orig:
+            if isinstance(value, list) and \
+               isinstance(orig[key], list):
+                orig[key] += value
+                continue
+
+            elif isinstance(value, dict) and \
+                 isinstance(orig[key], dict):
+                orig[key] = merge_configs(orig[key], value)
+                continue
+
+            # more special values here, if needed
+
+        orig[key] = value
+
+    return orig
